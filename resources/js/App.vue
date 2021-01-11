@@ -128,24 +128,14 @@ export default {
     console.log("Component mounted.");
   },
   methods: {
-    sortProduct(type) {
-      console.log("sort-->" + type);
-
-      this.product = this.arrays.sort(() => {
-        if (this.sort === "name") {
-          if (a.name < b.name) return -1;
-          if (a.name > b.name) return 1;
-        } else if (this.sort === "price") {
-          if (a.price < b.price) return -1;
-          if (a.price > b.price) return 1;
-        }
-
-        return 0;
-      });
+    sortProduct(type) { 
+      if (type === "price")
+        this.products.sort((a, b) => (a.price > b.price ? 1 : -1));
+      else if (type === "name")
+        this.products.sort((a, b) => (a.name < b.name ? 1 : -1));
     },
     filterProducts(categoryId) {
       this.products = this.oldProducts;
-      console.log(this.oldProducts);
       if (categoryId != -1) {
         const newProducts = this.products.filter(
           (product) => product.category_id == categoryId

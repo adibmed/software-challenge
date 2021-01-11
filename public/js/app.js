@@ -1992,24 +1992,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   methods: {
     sortProduct: function sortProduct(type) {
-      var _this = this;
-
-      console.log("sort-->" + type);
-      this.product = this.arrays.sort(function () {
-        if (_this.sort === "name") {
-          if (a.name < b.name) return -1;
-          if (a.name > b.name) return 1;
-        } else if (_this.sort === "price") {
-          if (a.price < b.price) return -1;
-          if (a.price > b.price) return 1;
-        }
-
-        return 0;
+      if (type === "price") this.products.sort(function (a, b) {
+        return a.price > b.price ? 1 : -1;
+      });else if (type === "name") this.products.sort(function (a, b) {
+        return a.name < b.name ? 1 : -1;
       });
     },
     filterProducts: function filterProducts(categoryId) {
       this.products = this.oldProducts;
-      console.log(this.oldProducts);
 
       if (categoryId != -1) {
         var newProducts = this.products.filter(function (product) {
@@ -2024,18 +2014,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       showPopup = !showPopup;
     },
     refreashProducts: function refreashProducts() {
-      var _this2 = this;
+      var _this = this;
 
       fetch("http://localhost:8001/api/products/").then(function (response) {
         return response.json();
       }).then(function (data) {
-        _this2.products = data;
-        _this2.oldProducts = data;
+        _this.products = data;
+        _this.oldProducts = data;
       });
       fetch("http://localhost:8001/api/categories/").then(function (response) {
         return response.json();
       }).then(function (data) {
-        _this2.categories = data;
+        _this.categories = data;
       });
       this.showPopup = false;
     }
