@@ -14,7 +14,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        // get all categories
+        return Category::all();
     }
 
     /**
@@ -35,7 +36,8 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // crate a category
+        return Category::create($request->all());
     }
 
     /**
@@ -44,9 +46,9 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function show($id)
     {
-        //
+        // 
     }
 
     /**
@@ -67,9 +69,9 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
-        //
+        
     }
 
     /**
@@ -78,8 +80,9 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy($id)
     {
-        //
+        // delete a category
+        Category::destroy($id);
     }
 }
