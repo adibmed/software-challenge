@@ -5,7 +5,10 @@
         <div class="card">
           <div class="card-header">Add New Product</div>
           <div class="card-body">
-            <ProductCreate :categories="categories" />
+            <ProductCreate
+              :categories="categories"
+              v-on:refreash-products="refreashProducts"
+            />
           </div>
         </div>
       </div>
@@ -63,11 +66,19 @@
                   Category
                 </button>
                 <ul class="dropdown-menu">
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      @click="filterProducts(-1)"
+                      >All</a
+                    >
+                  </li>
                   <li v-for="category in categories" :key="category.id">
                     <a
                       class="dropdown-item"
                       href="#"
-                      @click="filterProducts(category.name)"
+                      @click="filterProducts(category.id)"
                       >{{ category.name }}</a
                     >
                   </li>
@@ -76,7 +87,11 @@
             </div>
           </div>
 
-          <div class="card-body" v-for="product in products" :key="product.id">
+          <div
+            class="card-body m-0 p-0"
+            v-for="product in products"
+            :key="product.id"
+          >
             <Product
               :key="product.price"
               :name="product.name"
@@ -102,6 +117,7 @@ export default {
       products: null,
       categories: null,
       showPopup: false,
+      oldProducts: null,
     };
   },
   components: {
@@ -112,28 +128,72 @@ export default {
     console.log("Component mounted.");
   },
   methods: {
-    sortProduct: (type) => {
+    sortProduct(type) {
       console.log("sort-->" + type);
+
+      this.product = this.arrays.sort(() => {
+        if (this.sort === "name") {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+        } else if (this.sort === "price") {
+          if (a.price < b.price) return -1;
+          if (a.price > b.price) return 1;
+        }
+
+        return 0;
+      });
     },
-    filterProducts: (category) => {
-      console.log("category-->" + category);
+    filterProducts(categoryId) {
+      this.products = this.oldProducts;
+      console.log(this.oldProducts);
+      if (categoryId != -1) {
+        const newProducts = this.products.filter(
+          (product) => product.category_id == categoryId
+        );
+        this.products = newProducts;
+      } else {
+        this.products = this.oldProducts;
+      }
     },
     showCreateProduct: () => {
       showPopup = !showPopup;
     },
+    refreashProducts() {
+      fetch("http://localhost:8001/api/products/")
+        .then((response) => response.json())
+        .then((data) => {
+          this.products = data;
+          this.oldProducts = data;
+        });
+
+      fetch("http://localhost:8001/api/categories/")
+        .then((response) => response.json())
+        .then((data) => {
+          this.categories = data;
+        });
+
+      this.showPopup = false;
+    },
   },
   mounted: function () {
-    fetch("http://localhost:8001/api/products/")
-      .then((response) => response.json())
-      .then((data) => {
-        this.products = data;
-      });
+    this.refreashProducts();
+  },
+  computed: {
+    sortedProducts: function () {
+      function compare(a, b) {
+        if (this.sort === "name") {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+        } else if (this.sort === "price") {
+          if (a.price < b.price) return -1;
+          if (a.price > b.price) return 1;
+        }
 
-    fetch("http://localhost:8001/api/categories/")
-      .then((response) => response.json())
-      .then((data) => {
-        this.categories = data;
-      });
+        return 0;
+      }
+
+      return this.arrays.sort(compare);
+    },
   },
 };
 </script>

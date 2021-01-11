@@ -1858,6 +1858,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _components_Product__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/Product */ "./resources/js/components/Product.vue");
 /* harmony import */ var _components_ProductCreate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/ProductCreate */ "./resources/js/components/ProductCreate.vue");
+var _data$components$moun;
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 //
@@ -1953,16 +1955,32 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_defineProperty({
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_data$components$moun = {
   data: function data() {
     return {
       sort: "name",
       filter: "all",
       products: null,
       categories: null,
-      showPopup: false
+      showPopup: false,
+      oldProducts: null
     };
   },
   components: {
@@ -1974,29 +1992,73 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   methods: {
     sortProduct: function sortProduct(type) {
+      var _this = this;
+
       console.log("sort-->" + type);
+      this.product = this.arrays.sort(function () {
+        if (_this.sort === "name") {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+        } else if (_this.sort === "price") {
+          if (a.price < b.price) return -1;
+          if (a.price > b.price) return 1;
+        }
+
+        return 0;
+      });
     },
-    filterProducts: function filterProducts(category) {
-      console.log("category-->" + category);
+    filterProducts: function filterProducts(categoryId) {
+      this.products = this.oldProducts;
+      console.log(this.oldProducts);
+
+      if (categoryId != -1) {
+        var newProducts = this.products.filter(function (product) {
+          return product.category_id == categoryId;
+        });
+        this.products = newProducts;
+      } else {
+        this.products = this.oldProducts;
+      }
     },
     showCreateProduct: function showCreateProduct() {
       showPopup = !showPopup;
+    },
+    refreashProducts: function refreashProducts() {
+      var _this2 = this;
+
+      fetch("http://localhost:8001/api/products/").then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        _this2.products = data;
+        _this2.oldProducts = data;
+      });
+      fetch("http://localhost:8001/api/categories/").then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        _this2.categories = data;
+      });
+      this.showPopup = false;
     }
   }
-}, "mounted", function mounted() {
-  var _this = this;
+}, _defineProperty(_data$components$moun, "mounted", function mounted() {
+  this.refreashProducts();
+}), _defineProperty(_data$components$moun, "computed", {
+  sortedProducts: function sortedProducts() {
+    function compare(a, b) {
+      if (this.sort === "name") {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+      } else if (this.sort === "price") {
+        if (a.price < b.price) return -1;
+        if (a.price > b.price) return 1;
+      }
 
-  fetch("http://localhost:8001/api/products/").then(function (response) {
-    return response.json();
-  }).then(function (data) {
-    _this.products = data;
-  });
-  fetch("http://localhost:8001/api/categories/").then(function (response) {
-    return response.json();
-  }).then(function (data) {
-    _this.categories = data;
-  });
-}));
+      return 0;
+    }
+
+    return this.arrays.sort(compare);
+  }
+}), _data$components$moun);
 
 /***/ }),
 
@@ -2011,6 +2073,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
 /* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -38573,7 +38645,10 @@ var render = function() {
                 "div",
                 { staticClass: "card-body" },
                 [
-                  _c("ProductCreate", { attrs: { categories: _vm.categories } })
+                  _c("ProductCreate", {
+                    attrs: { categories: _vm.categories },
+                    on: { "refreash-products": _vm.refreashProducts }
+                  })
                 ],
                 1
               )
@@ -38670,8 +38745,8 @@ var render = function() {
                   _c(
                     "ul",
                     { staticClass: "dropdown-menu" },
-                    _vm._l(_vm.categories, function(category) {
-                      return _c("li", { key: category.id }, [
+                    [
+                      _c("li", [
                         _c(
                           "a",
                           {
@@ -38679,15 +38754,33 @@ var render = function() {
                             attrs: { href: "#" },
                             on: {
                               click: function($event) {
-                                return _vm.filterProducts(category.name)
+                                return _vm.filterProducts(-1)
                               }
                             }
                           },
-                          [_vm._v(_vm._s(category.name))]
+                          [_vm._v("All")]
                         )
-                      ])
-                    }),
-                    0
+                      ]),
+                      _vm._v(" "),
+                      _vm._l(_vm.categories, function(category) {
+                        return _c("li", { key: category.id }, [
+                          _c(
+                            "a",
+                            {
+                              staticClass: "dropdown-item",
+                              attrs: { href: "#" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.filterProducts(category.id)
+                                }
+                              }
+                            },
+                            [_vm._v(_vm._s(category.name))]
+                          )
+                        ])
+                      })
+                    ],
+                    2
                   )
                 ])
               ])
@@ -38696,7 +38789,7 @@ var render = function() {
             _vm._l(_vm.products, function(product) {
               return _c(
                 "div",
-                { key: product.id, staticClass: "card-body" },
+                { key: product.id, staticClass: "card-body m-0 p-0" },
                 [
                   _c("Product", {
                     key: product.price,
@@ -38742,7 +38835,24 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
-    _c("div", { staticClass: "row" }, [_vm._v("Product " + _vm._s(_vm.name))])
+    _c("div", { staticClass: "row border-top" }, [
+      _c("div", { staticClass: "col-4 bg-secondary p-0" }, [
+        _c("img", {
+          staticClass: "w-100 h-100 img-fluid",
+          attrs: { src: _vm.image, alt: "" }
+        })
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-8 py-3" }, [
+        _c("h4", [_vm._v(_vm._s(_vm.name))]),
+        _vm._v(" "),
+        _c("h6", [_vm._v(_vm._s(_vm.description))]),
+        _vm._v(" "),
+        _c("h4", { staticClass: "fond-bold" }, [
+          _vm._v(_vm._s(_vm.price) + " $")
+        ])
+      ])
+    ])
   ])
 }
 var staticRenderFns = []
