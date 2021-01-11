@@ -20,10 +20,10 @@ use App\Http\Controllers\CategoryController;
 */
 
 // CRUD for products
-Route::resource('products', ProductController::class)->only(['index', 'create', 'destroy']);
+Route::resource('products', ProductController::class);
 
 // CRUD for categories
-Route::resource('category', CategoryController::class);
+Route::resource('categories', CategoryController::class);
 
 
 

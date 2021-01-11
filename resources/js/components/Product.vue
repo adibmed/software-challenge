@@ -6,12 +6,8 @@
 
 <script>
 export default {
-  props: {
-    name: String,
-    description: String,
-    price: Number,
-    image: String,
-  },
+  name: "Product",
+  props: ["name", "description", "price", "image"],
 };
 </script>
 

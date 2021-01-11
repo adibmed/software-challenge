@@ -13,4 +13,8 @@ class Category extends Model
         'name',
         'parent_category',
     ];
+
+    public function products() {
+        return $this->hasMany('App\Product');
+    }
 }

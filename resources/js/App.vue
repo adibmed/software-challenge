@@ -1,5 +1,16 @@
 <template>
   <div class="container">
+    <div v-if="showPopup" class="row justify-content-center pt-5">
+      <div class="col-md-10">
+        <div class="card">
+          <div class="card-header">Add New Product</div>
+          <div class="card-body">
+            <ProductCreate :categories="categories" />
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row justify-content-center pt-5">
       <div class="col-md-10">
         <div class="card">
@@ -7,7 +18,7 @@
             <button
               type="button"
               class="btn btn-success"
-              v-on:click="createProduct"
+              v-on:click="showPopup = !showPopup"
             >
               Create
             </button>
@@ -24,10 +35,20 @@
                 </button>
                 <ul class="dropdown-menu">
                   <li>
-                    <a class="dropdown-item" href="#">name</a>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      @click="sortProduct('name')"
+                      >name</a
+                    >
                   </li>
                   <li>
-                    <a class="dropdown-item" href="#">price</a>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      @click="sortProduct('price')"
+                      >price</a
+                    >
                   </li>
                 </ul>
               </div>
@@ -42,34 +63,26 @@
                   Category
                 </button>
                 <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item" href="#">Category 1</a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#">Category 2</a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#">Category 3</a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#">Category 4</a>
-                  </li>
-                  <li>
-                    <a class="dropdown-item" href="#">Category 5</a>
+                  <li v-for="category in categories" :key="category.id">
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      @click="filterProducts(category.name)"
+                      >{{ category.name }}</a
+                    >
                   </li>
                 </ul>
               </div>
             </div>
           </div>
 
-          <div class="card-body">
+          <div class="card-body" v-for="product in products" :key="product.id">
             <Product
-              :v-for="product in products"
-              :key="{ product.price }"
-              name="{product.name}"
-              description="{product.description}"
-              price="{product.price}"
-              image="{product.image}"
+              :key="product.price"
+              :name="product.name"
+              :description="product.description"
+              :price="product.price"
+              :image="product.image"
             />
           </div>
         </div>
@@ -80,32 +93,51 @@
 
 <script>
 import Product from "./components/Product";
+import ProductCreate from "./components/ProductCreate";
 export default {
-  created: async () => {
-      console.log("Component created.");
-    // get all the product
-    const response = await fetch("http://localhost:8001/api/products/");
-    const data = await response.json();
-    console.log(data);
-    this.products = data;
-  },
   data: () => {
     return {
       sort: "name",
       filter: "all",
       products: null,
+      categories: null,
+      showPopup: false,
     };
   },
   components: {
     Product,
+    ProductCreate,
   },
   mounted() {
     console.log("Component mounted.");
   },
   methods: {
-    createProduct: () => {},
-    sortProduct: () => {},
-    filterProducts: () => {},
+    sortProduct: (type) => {
+      console.log("sort-->" + type);
+    },
+    filterProducts: (category) => {
+      console.log("category-->" + category);
+    },
+    showCreateProduct: () => {
+      showPopup = !showPopup;
+    },
+  },
+  mounted: function () {
+    fetch("http://localhost:8001/api/products/")
+      .then((response) => response.json())
+      .then((data) => {
+        this.products = data;
+      });
+
+    fetch("http://localhost:8001/api/categories/")
+      .then((response) => response.json())
+      .then((data) => {
+        this.categories = data;
+      });
   },
 };
 </script>
+
+
+<style>
+</style>
